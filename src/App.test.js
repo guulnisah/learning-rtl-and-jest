@@ -10,6 +10,7 @@
 */
 
 import { render, screen } from "@testing-library/react";
+import user from "@testing-library/user-event"
 import App from "./App";
 
 /* 
@@ -29,6 +30,12 @@ test("purpose", async () => {
   // now we can access elements that have been rendered by using the 'screen' object
   // to get the individual elements we use query functions
   // react testing library query system has a collection of ~48 function (.getByRole, .queryByLabelText, .findByTitle, etc....)
+
+  // Remembering all of these function may be difficult, so we can use this function:
+  screen.logTestingPlaygroundURL()
+  // This will givee us the link to view the HTML that was rendered in the Testing Playground tool.
+  // It helps us write queries.  
+
   const button = screen.getByRole("button");
 
   /* 
@@ -49,4 +56,29 @@ test("purpose", async () => {
   The matchers are coming from jest ('https://jestjs.io/docs/expect') and RTL ('https://github.com/testing-library/jest-dom#custom-matchers')
 */
   expect(button).toBeInTheDocument(1);
+});
+
+test('can receive a new user and show it on a list', () => {
+  render(<App />);
+
+  const nameInput = screen.getByRole('textbox', {
+    name: /name/i,
+  });
+  const emailInput = screen.getByRole('textbox', {
+    name: /email/i,
+  });
+  const button = screen.getByRole('button');
+
+  user.click(nameInput);
+  user.keyboard('jane');
+  user.click(emailInput);
+  user.keyboard('jane@jane.com');
+
+  user.click(button);
+
+  const name = screen.getByRole('cell', { name: 'jane' });
+  const email = screen.getByRole('cell', { name: 'jane@jane.com' });
+
+  expect(name).toBeInTheDocument();
+  expect(email).toBeInTheDocument();
 });
